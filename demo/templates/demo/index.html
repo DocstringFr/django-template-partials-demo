@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Django Template Partials + HTMX Demo</title>
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+
+    </head>
+    <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+        {% load partials %}
+
+        <div class="container mx-auto px-4 py-8">
+            <header class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-gray-800 mb-4">
+                    🚀 Django Template Partials + HTMX
+                </h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Application de démonstration des template partials avec HTMX pour des mises à jour dynamiques ultra-rapides !
+                </p>
+
+            <!-- Badge de statut en ligne/hors ligne -->
+                <div class="mt-6 flex justify-center">
+                    <div class="inline-flex items-center space-x-2 bg-white rounded-full px-4 py-2 shadow-lg border">
+                        <span class="text-sm font-medium text-gray-700">Statut :</span>
+                        {% partialdef online-status inline %}
+                            <div id="online-status"
+                                 class="flex items-center space-x-2"
+                                 hx-get="{% url 'online-status' %}"
+                                 hx-trigger="every 2s"
+                                 hx-swap="outerHTML">
+                                <span class="w-3 h-3 rounded-full {{ status_color|default:'bg-red-500' }} animate-pulse"></span>
+                                <span class="text-sm font-semibold {% if is_online %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {{ status_text|default:'Hors ligne' }}
+                                </span>
+                                <span class="text-lg">{{ status_icon|default:'🔴' }}</span>
+                            </div>
+                        {% endpartialdef online-status %}
+                    </div>
+                </div>
+            </header>
+
+            <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-2">
+                <!-- Section statique -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+                        ✨ Section Statique
+                    </h2>
+                    <div class="space-y-4 text-gray-600">
+                        <p class="text-lg">
+                            Cette section reste complètement inchangée lors des mises à jour HTMX.
+                        </p>
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                            <p class="text-sm text-blue-700">
+                                💡 <strong>Astuce :</strong> Regardez les outils de développement de votre navigateur
+                                pour voir que seul le HTML du partial est transmis !
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citations dynamiques -->
+                {% partialdef dynamic-content inline %}
+                    <div class="bg-white rounded-xl shadow-lg p-8 fade-in" id="dynamic-content">
+                        <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+                            🔄 Contenu Dynamique
+                        </h2>
+
+                        <div class="p-6 rounded-xl {{ color|default:'bg-gray-100' }} mb-6 shadow-inner">
+                            <blockquote class="text-xl font-medium text-gray-800 italic relative">
+                                <span class="text-4xl text-gray-400 absolute -top-2 -left-2">"</span>
+                                <span class="pl-6">{{ quote|default:'Cliquez sur le bouton pour charger une citation inspirante !' }}</span>
+                                <span class="text-4xl text-gray-400">"</span>
+                            </blockquote>
+                        </div>
+
+                        {% if timestamp %}
+                            <div class="flex items-center text-sm text-gray-500 mb-6">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                </svg>
+                                Dernière mise à jour : <strong class="ml-1">{{ timestamp }}</strong>
+                            </div>
+                        {% endif %}
+
+                        <div class="flex space-x-4">
+                            <button
+                                hx-get="{% url 'update-content' %}"
+                                hx-target="#dynamic-content"
+                                hx-swap="outerHTML"
+                                class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                            >
+                                <span class="loading">🔄</span>
+                                <span>🎲 Nouvelle Citation</span>
+                            </button>
+                        </div>
+                    </div>
+                {% endpartialdef dynamic-content %}
+            </div>
+
+            <!-- Like Counter -->
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto mt-2">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+                    👍 Like Counter 💬
+                </h2>
+                {% partialdef like-counter inline %}
+                    <p id="like-counter">Vous avez liké cette citation {{ like_count }} fois.</p>
+                {% endpartialdef like-counter %}
+                <div class="flex items-center space-x-4">
+                    <button hx-post="{% url 'like-counter' %}"
+                            hx-target="#like-counter"
+                            hx-swap="outerHTML"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Like
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Boutique / Panier -->
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto mt-2">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-3xl font-semibold text-gray-800">🛒 Boutique</h2>
+                    {% partialdef cart-icon inline %}
+                        <a id="cart-icon" class="relative inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-gray-700">
+                                <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.149 0 .28.098.321.242l.401 1.403 1.386 4.85-.63 1.26A1.5 1.5 0 006.5 13.5h12.75a.75.75 0 000-1.5H6.5l.375-.75h10.78a1.5 1.5 0 001.385-.95l1.69-4.225a.75.75 0 00-.7-1.025H5.357l-.21-.735A1.875 1.875 0 003.636 2.25H2.25z" />
+                                <path d="M8.25 20.25a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM18.75 20.25a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                            </svg>
+                            <span class="absolute -top-1 -right-1 min-w-[1.5rem] h-6 px-1 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow">
+                                {{ cart_count|default:0 }}
+                            </span>
+                        </a>
+                        {% if product_id %}
+                            <span id="product-qty-{{ product_id }}" class="text-sm text-gray-700" hx-swap-oob="true">Qté: {{ product_qty }}</span>
+                        {% endif %}
+                    {% endpartialdef cart-icon %}
+                </div>
+
+                <!-- Grille de produits -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {% for p in products %}
+                        <div class="border rounded-xl p-4 shadow-sm bg-white flex flex-col">
+                            <div class="flex-1">
+                                <h4 class="text-lg font-semibold text-gray-800">{{ p.name }}</h4>
+                                <p class="text-gray-600">{{ p.price }} €</p>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between">
+                                <span id="product-qty-{{ p.id }}" class="text-sm text-gray-700">Qté: {{ p.qty|default:0 }}</span>
+                                <div class="flex items-center space-x-2">
+                                    <button
+                                        hx-post="{% url 'remove-from-cart' p.id %}"
+                                        hx-target="#cart-icon"
+                                        hx-swap="outerHTML"
+                                        class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                                        − Retirer
+                                    </button>
+                                    <button
+                                        hx-post="{% url 'add-to-cart' p.id %}"
+                                        hx-target="#cart-icon"
+                                        hx-swap="outerHTML"
+                                        class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+                                        + Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

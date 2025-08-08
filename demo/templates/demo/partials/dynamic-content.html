@@ -1,0 +1,34 @@
+<div class="bg-white rounded-xl shadow-lg p-8 fade-in" id="dynamic-content">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+        🔄 Contenu Dynamique
+    </h2>
+
+    <div class="p-6 rounded-xl {{ color|default:'bg-gray-100' }} mb-6 shadow-inner">
+        <blockquote class="text-xl font-medium text-gray-800 italic relative">
+            <span class="text-4xl text-gray-400 absolute -top-2 -left-2">"</span>
+            <span class="pl-6">{{ quote|default:'Cliquez sur le bouton pour charger une citation inspirante !' }}</span>
+            <span class="text-4xl text-gray-400">"</span>
+        </blockquote>
+    </div>
+
+    {% if timestamp %}
+        <div class="flex items-center text-sm text-gray-500 mb-6">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+            </svg>
+            Dernière mise à jour : <strong class="ml-1">{{ timestamp }}</strong>
+        </div>
+    {% endif %}
+
+    <div class="flex space-x-4">
+        <button
+            hx-get="{% url 'update-content' %}"
+            hx-target="#dynamic-content"
+            hx-swap="outerHTML"
+            class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+        >
+            <span class="loading">🔄</span>
+            <span>🎲 Nouvelle Citation</span>
+        </button>
+    </div>
+</div>

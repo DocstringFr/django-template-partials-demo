@@ -1,0 +1,12 @@
+<a id="cart-icon" class="relative inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-gray-700">
+        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.149 0 .28.098.321.242l.401 1.403 1.386 4.85-.63 1.26A1.5 1.5 0 006.5 13.5h12.75a.75.75 0 000-1.5H6.5l.375-.75h10.78a1.5 1.5 0 001.385-.95l1.69-4.225a.75.75 0 00-.7-1.025H5.357l-.21-.735A1.875 1.875 0 003.636 2.25H2.25z" />
+        <path d="M8.25 20.25a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM18.75 20.25a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+    </svg>
+    <span class="absolute -top-1 -right-1 min-w-[1.5rem] h-6 px-1 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow">
+        {{ cart_count|default:0 }}
+    </span>
+</a>
+{% if product_id %}
+    <span id="product-qty-{{ product_id }}" class="text-sm text-gray-700" hx-swap-oob="true">Qté: {{ product_qty }}</span>
+{% endif %}

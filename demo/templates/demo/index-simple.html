@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Django Template Partials + HTMX Demo</title>
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <header class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-gray-800 mb-4">
+                    🚀 Django Template Partials + HTMX
+                </h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Application de démonstration des template partials avec HTMX pour des mises à jour dynamiques ultra-rapides !
+                </p>
+
+                <!-- Badge de statut en ligne/hors ligne -->
+                <div class="mt-6 flex justify-center">
+                    <div class="inline-flex items-center space-x-2 bg-white rounded-full px-4 py-2 shadow-lg border">
+                        <span class="text-sm font-medium text-gray-700">Statut :</span>
+                        {% include "demo/partials/online-status.html" %}
+                    </div>
+                </div>
+            </header>
+
+            <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-2">
+                <!-- Section statique -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+                        ✨ Section Statique
+                    </h2>
+                    <div class="space-y-4 text-gray-600">
+                        <p class="text-lg">
+                            Cette section reste complètement inchangée lors des mises à jour HTMX.
+                        </p>
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                            <p class="text-sm text-blue-700">
+                                💡 <strong>Astuce :</strong> Regardez les outils de développement de votre navigateur
+                                pour voir que seul le HTML du partial est transmis !
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citations dynamiques -->
+                {% include "demo/partials/dynamic-content.html" %}
+            </div>
+
+            <!-- Like Counter -->
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto mt-2">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+                    👍 Like Counter 💬
+                </h2>
+                {% include "demo/partials/like-counter.html" %}
+                <div class="flex items-center space-x-4">
+                    <button hx-post="{% url 'like-counter' %}"
+                            hx-target="#like-counter"
+                            hx-swap="outerHTML"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Like
+                    </button>
+                </div>
+            </div>
+
+            <!-- Boutique / Panier -->
+            <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto mt-2">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-3xl font-semibold text-gray-800">🛒 Boutique</h2>
+                    {% include "demo/partials/cart-icon.html" %}
+                </div>
+
+                <!-- Grille de produits -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {% for p in products %}
+                        <div class="border rounded-xl p-4 shadow-sm bg-white flex flex-col">
+                            <div class="flex-1">
+                                <h4 class="text-lg font-semibold text-gray-800">{{ p.name }}</h4>
+                                <p class="text-gray-600">{{ p.price }} €</p>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between">
+                                <span id="product-qty-{{ p.id }}" class="text-sm text-gray-700">Qté: {{ p.qty|default:0 }}</span>
+                                <div class="flex items-center space-x-2">
+                                    <button
+                                        hx-post="{% url 'remove-from-cart' p.id %}"
+                                        hx-target="#cart-icon"
+                                        hx-swap="outerHTML"
+                                        class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                                        − Retirer
+                                    </button>
+                                    <button
+                                        hx-post="{% url 'add-to-cart' p.id %}"
+                                        hx-target="#cart-icon"
+                                        hx-swap="outerHTML"
+                                        class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+                                        + Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
